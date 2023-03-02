@@ -11,11 +11,15 @@ public class EncryptMessage
         string messageEncrypt = "";
         string messageToDecrypt = "";
 
-        BigInteger x, y, z;
+        BigInteger n, d, e, p, q, m;
 
         int bitLength = 4096;
 
+        Random valueRandom = new Random();
 
+        BigInteger()
+
+        p = new BigInteger(1, new Random().NextBytes());
     }
 
 }
