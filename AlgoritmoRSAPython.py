@@ -1,4 +1,5 @@
 #Código feito parcialmente com auxilio do ChatGPT (Para converter string em bytes em int e depois reverter a operação)
+#Arquivo original mantido para fins de histórico e arquivamento
 import math
 from Crypto.Util import number
 from Crypto.Util.number import bytes_to_long, long_to_bytes
@@ -9,12 +10,12 @@ msg = "Lorem Ipsum Dolores"
 start = datetime.now()
 n_length = 4096
 
-# Escolher p e q (números primos) para ocálculo de N=p.q
+# Escolher p e q (números primos) para o cálculo de N=p.q
 prime_lengh = n_length // 2
 p = number.getPrime(prime_lengh)
 q = number.getPrime(prime_lengh)
 
-# para ocálculo de N=p.q
+# para o cálculo de N=p.q
 n = p * q
 
 # Calcular a função totiente phi(N)= (p-1).(q-1)
@@ -25,7 +26,7 @@ e = 3
 while(math.gcd(phiN, e) > 1):
     e = e+2
 
-# Escolha d talque e.d mod phi(N) = 1
+# Escolha d tal que e.d mod phi(N) = 1
 d = pow(e, -1, phiN)
 
 # Converter a string em uma sequência de bytes e em seguida, para um inteiro
