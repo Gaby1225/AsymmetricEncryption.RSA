@@ -39,8 +39,15 @@ def encriptarMensagem(msg: str, e: number, n: number):
     return (msg_cripto_bytes)
 
 def decriptarMensagem(msg: bytes, d: number, n: number):
+    # Converter a sequência de bytes para um inteiro
     msg_cripto_int = bytes_to_long(msg)
+
+    # Elevar o inteiro à potência e calcular o resto da divisão pelo módulo
     msg_decripto_int = pow(msg_cripto_int, d, n)
+
+    # Converte a mensagem decriptografada de volta para bytes
     msg_decripto_bytes = long_to_bytes(msg_decripto_int)
+
+    # Converter a sequência de bytes obtida de volta para string
     msg_decripto_str = msg_decripto_bytes.decode('utf-8')
     return (msg_decripto_str)

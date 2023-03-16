@@ -1,22 +1,35 @@
+# Código criado a partir do exemplo do prof. Fábio Cabrini
 import socket
 import RSA
 
-#ToDo: Organizar código com nomes de variáveis melhores e possivelmente outro fluxo (Permitir escrever a mensagem em tempo de execução talvez?)
+mensagemDeHandshake = "Hello"
+mensagemASerEnviada = "Hello UDP Server"
+serverAddressPort = ("127.0.0.1", 20001)
+bufferSize = 2048
 
-print("Enviando mensagem")
-msgFromClient       = "Hello UDP Server"
-serverAddressPort   = ("127.0.0.1", 20001)
-bufferSize          = 2048
-# Create a UDP socket at client side
+# Criar um socket UDP para o cliente
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-# Send to server using created UDP socket
-UDPClientSocket.sendto(str.encode("Hello"), serverAddressPort)
-msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-msgList = str(msgFromServer[0],"utf-8").split(";")
-print('Message from server: ',msgList[0])
-e = int(msgList[1])
-n = int(msgList[2])
-UDPClientSocket.sendto(RSA.encriptarMensagem(msgFromClient, e,n), serverAddressPort)
-msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-msg = str(msgFromServer[0],"utf-8")
-print('Message from server: ',msg)
+
+# Enviar a mensagem de handshake para o servidor usando o socket criado
+UDPClientSocket.sendto(str.encode(mensagemDeHandshake), serverAddressPort)
+
+# Receber a mensagem de volta, com os valores de 'e' e 'n'
+mensagemDoServidor = UDPClientSocket.recvfrom(bufferSize)
+
+# Separar as informações
+mensagemSplit = str(mensagemDoServidor[0],"utf-8").split(";")
+print('Mensagem do servidor: ',mensagemSplit[0])
+
+# Obter 'e' e 'n'
+e = int(mensagemSplit[1])
+n = int(mensagemSplit[2])
+
+# Encriptar a mensagem e enviar
+mensagemEncriptada = RSA.encriptarMensagem(mensagemASerEnviada, e,n)
+UDPClientSocket.sendto(mensagemEncriptada, serverAddressPort)
+
+# Receber a resposta
+mensagemDoServidor2 = UDPClientSocket.recvfrom(bufferSize)
+mensagem = str(mensagemDoServidor2[0],"utf-8")
+
+print('Mensagem do servidor: ',mensagem)

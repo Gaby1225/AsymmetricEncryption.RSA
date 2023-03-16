@@ -1,42 +1,55 @@
+# Código criado a partir do exemplo do prof. Fábio Cabrini
 import socket
 import RSA
-
-#ToDo: Organizar código com nomes de variáveis melhores e melhorar a resposta do server (Não responder com a chave pública toda vez)
 
 print("Gerando chaves assimétricas")
 chaves = RSA.gerarChaves(4096)
 (e, n) = chaves[0]
 (d, n) = chaves[1]
+print("Chaves assimétricas criadas")
 
 localIP = "127.0.0.1"
 localPort = 20001
 bufferSize = 2048
-msgFromServer = f'Hello;{e};{n}'
-bytesToSend = str.encode(msgFromServer)
-# Create a datagram socket
+mensagemDeHandshake = "Hello"
+retornoDoHandshake = f'{mensagemDeHandshake};{e};{n}'
+bytesDeHandshake = str.encode(retornoDoHandshake)
+retornoParaCliente = "Hello UDP Client"
+bytesParaCliente = str.encode(retornoParaCliente)
+
+# Criar um socket de datagrama
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-# Bind to address and ip
+
+# Associar para o endereço IP e porta
 UDPServerSocket.bind((localIP, localPort))
-print("UDP server up and listening")
-# Listen for incoming datagrams
+print("Servidor UDP iniciado")
+
+# Receber Datagramas
 while(True):
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
-    message = bytesAddressPair[0]
-    address = bytesAddressPair[1]
+    mensagem = bytesAddressPair[0]
+    endereco = bytesAddressPair[1]
     try:
-        clientMsg = str(message, "utf-8")
+        # Tentar converter a mensagem (Gera exceção se mensagem está criptografada)
+        mensagemCliente = str(mensagem, "utf-8")
     except:
-        clientMsg = ""
-    if (clientMsg == "Hello"):
-        clientIP = "Client IP Address:{}".format(address)
-        print('Messagem from client: ', clientMsg)
-        print(clientIP)
-        # Sending a reply to client
-        UDPServerSocket.sendto(bytesToSend, address)
+        mensagemCliente = ""
+    
+    # Se a mensagem for o handshake, enviar os valores de 'e' e 'n', se não, decriptar a mensagem
+    if (mensagemCliente == mensagemDeHandshake):
+        clienteIP = "Endereço IP do Cliente: {}".format(endereco)
+        print('Mensagem do cliente: ', mensagemCliente)
+        print(clienteIP)
+
+        # Enviar o handshake de volta, com os valores de 'e' e 'n'
+        UDPServerSocket.sendto(bytesDeHandshake, endereco)
     else:
-        clientIP = "Client IP Address:{}".format(address)
-        print('Messagem from client: ', RSA.decriptarMensagem(
-            message, d, n))
-        print(clientIP)
-        # Sending a reply to client
-        UDPServerSocket.sendto(bytesToSend, address)
+        clienteIP = "Endereço IP do Cliente: {}".format(endereco)
+
+        # Decriptografar a mensagem do cliente
+        mensagemDoCliente = RSA.decriptarMensagem(mensagem, d, n)
+        print('Mensagem do cliente: ', mensagemDoCliente)
+        print(clienteIP)
+
+        # Responder o cliente
+        UDPServerSocket.sendto(bytesParaCliente, endereco)
